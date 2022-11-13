@@ -6,12 +6,14 @@ class Test < ApplicationRecord
   belongs_to :category
   belongs_to :author, class_name: 'User', foreing_key: :author_id
 
-  #def sort_names_by_category(name_category)
-  #  joins('JOIN categories ON categories.id = tests.category_id')
-  #  .where(categories: {title: name_category })
-  #end
+  validates :title, presence: true
+  validates :level, numericality: { only_integer: true, greater_than: 0 }
+  validates :title, :level, uniqueness: true
+  validates :title, uniqueness: { scope: :level }
 
-  def sort_names_by_category(name_category)
-    joins(:category).where(categories: { title: name_category })
-  end
+  scope :easy, -> (level) { where(level: level) }
+  scope :lite, -> { where(level: 0..1) }
+  scope :normal, -> { where(level: 2..4) }
+  score :hard, -> { where(level: 5..Float::INFINITY) }
+
 end
